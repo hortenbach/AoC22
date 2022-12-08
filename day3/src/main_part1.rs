@@ -21,27 +21,11 @@ pub fn special_item(stuff: &str) -> char {
     special
 }
 
-pub fn group_priority(backpacks: &str) -> u16 {
-    let stuff = backpacks.lines().collect::<Vec<_>>();
-    let mut line_count: usize = stuff.len();
-    let mut res: Vec<u16> = vec![];
-    while line_count >= 2 {
-        let first: HashSet<char> = stuff[line_count - 1].chars().collect();
-        line_count -= 1;
-        let second: HashSet<char> = stuff[line_count - 1].chars().collect();
-        line_count -= 1;
-        let third: HashSet<char> = stuff[line_count - 1].chars().collect();
-        line_count -= 1;
-
-        let same_a: HashSet<_> = first.intersection(&second).collect();
-        let same_b: HashSet<_> = first.intersection(&third).collect();
-        // let same_c: HashSet<_> = second.intersection(&third).collect();
-        // let same_ab: HashSet<_> = same_a.intersection(&same_b).collect();
-        // let same_bc: HashSet<_> = same_b.intersection(&same_c).collect();
-        let same: HashSet<_> = same_a.intersection(&same_b).collect();
-        res.push(calc_priority(**same.iter().next().unwrap()));
-    }
-    res.iter().sum::<u16>()
+pub fn collect_special_items(backpacks: &str) -> Vec<char> {
+    backpacks
+        .lines()
+        .map(|bp| special_item(bp))
+        .collect()
 }
 
 // Lowercase item types a through z have priorities 1 through 26.
@@ -60,20 +44,18 @@ pub fn calc_priority(ascii: &char) -> u16 {
     ascii.encode_utf16(&mut buf)[0].checked_sub(dist).unwrap()
 }
 
-// PART 1/
-// pub fn priority(items: Vec<char>) -> u16 {
-//     items
-//         .iter()
-//         .map(|ascii| calc_priority(ascii))
-//         .sum()
-// }
+pub fn priority(items: Vec<char>) -> u16 {
+    items
+        .iter()
+        .map(|ascii| calc_priority(ascii))
+        .sum()
+}
 
 fn main() {
     let file_path = format!("{}/src/rucksacks", env!("CARGO_MANIFEST_DIR"));
     let stuff = &fs::read_to_string(&file_path).unwrap();
-    // let items = collect_special_items(stuff);
-    // let res = priority(items);
-    let res = group_priority(stuff);
+    let items = collect_special_items(stuff);
+    let res = priority(items);
     println!("{}", res)
 }
 
